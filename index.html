@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>University Result Portal</title>
+  <style>
+    body{font-family:Arial, sans-serif;background:#f4f6f9;padding:40px}
+    .card{max-width:700px;margin:auto;background:#fff;padding:25px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+    h2,h3{text-align:center}
+    input,button,textarea{width:100%;padding:10px;margin:8px 0}
+    button{background:#2563eb;color:#fff;border:none;border-radius:6px;cursor:pointer}
+    button:hover{background:#1e40af}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
+    th,td{border:1px solid #ccc;padding:8px;text-align:center}
+    .admin{display:none;margin-top:25px;border-top:1px solid #ddd;padding-top:20px}
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>🎓 University Result Portal</h2>
+
+  <!-- Student Section -->
+  <input id="roll" placeholder="Enter Roll Number">
+  <button onclick="checkResult()">View Result</button>
+  <div id="output"></div>
+
+  <!-- Admin Login -->
+  <h3>🔐 Admin Login</h3>
+  <input type="password" id="adminPass" placeholder="Admin Password">
+  <button onclick="loginAdmin()">Login</button>
+
+  <!-- Admin Panel -->
+  <div class="admin" id="adminPanel">
+    <h3>✏️ Edit Results</h3>
+    <textarea id="data" rows="10"></textarea>
+    <button onclick="saveData()">Save</button>
+  </div>
+</div>
+
+<script>
+/* ======================
+   CLEAN & STABLE VERSION
+   ====================== */
+
+const ADMIN_PASSWORD = "admin123";
+
+// Default database
+const defaultResults = {
+  "2520417": {
+    name: "Rayyan Ali",
+    examSession: "First Semester CGPA",
+    department: "BEE (to be trans. to BS Artificial Intelligence)",
+    institute: "Air University",
+    status: "PASS with 3.76 GPA",
+    subjects: {
+      "Calculus and Analytical Geometry": 98,
+      "Applied Physics": 89,
+      "Information and Communication Technology": 90,
+      "Electric Circuit Analysis": 79,
+      "Islamic Studies": 95,
+      "AP LAB": 99,
+      "ECA LAB": 96,
+      "Drawing LAB": 98,
+      "ICT LAB": 91
+    }
+  }
+};
+
+// Load data safely
+let results;
+try {
+  results = JSON.parse(localStorage.getItem("results")) || defaultResults;
+} catch {
+  results = defaultResults;
+}
+
+function checkResult(){
+  const roll = document.getElementById("roll").value.trim();
+  const out = document.getElementById("output");
+
+  if(!results[roll]){
+    out.innerHTML = "❌ Result not found";
+    return;
+  }
+
+  const s = results[roll];
+  let rows = "";
+  for(const sub in s.subjects){
+    rows += `<tr><td>${sub}</td><td>${s.subjects[sub]}</td></tr>`;
+  }
+
+  out.innerHTML = `
+    <h3>Result for Roll No: ${roll}</h3>
+    <p><b>Name:</b> ${s.name || "N/A"}</p>
+    <p><b>Exam Session:</b> ${s.examSession || "Not Provided"}</p>
+    <p><b>Department:</b> ${s.department || "Not Provided"}</p>
+    <p><b>Institute:</b> ${s.institute || "Not Provided"}</p>
+    <p><b>Status:</b> ${s.status || "N/A"}</p>
+    <table>
+      <tr><th>Subject</th><th>Marks</th></tr>
+      ${rows}
+    </table>`;
+}
+
+function loginAdmin(){
+  if(document.getElementById("adminPass").value === ADMIN_PASSWORD){
+    document.getElementById("adminPanel").style.display = "block";
+    document.getElementById("data").value = JSON.stringify(results, null, 2);
+    alert("Admin logged in");
+  } else {
+    alert("Wrong password");
+  }
+}
+
+function saveData(){
+  try{
+    results = JSON.parse(document.getElementById("data").value);
+    localStorage.setItem("results", JSON.stringify(results));
+    alert("Saved successfully");
+  }catch{
+    alert("Invalid JSON format");
+  }
+}
+</script>
+
+</body>
+</html>
