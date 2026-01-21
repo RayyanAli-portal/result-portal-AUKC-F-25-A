@@ -85,9 +85,34 @@ function checkResult(){
   }
 
   const s = results[roll];
+  const creditHours = {
+    "Calculus and Analytical Geometry": 3,
+    "Electric Circuit Analysis": 3,
+    "Applied Physics": 2,
+    "Islamic Studies": 2,
+    "Information and Communication Technology": 1,
+    "AP LAB": 1,
+    "ECA LAB": 1,
+    "Drawing LAB": 1,
+    "ICT LAB": 1
+  };
+
   let rows = "";
+  let totalQualityPoints = 0;
+  let totalCredits = 0;
+
   for(const sub in s.subjects){
-    rows += `<tr><td>${sub}</td><td>${s.subjects[sub]}</td></tr>`;
+    const marks = s.subjects[sub];
+    const grade = marks >= 85 ? "A" : "A-";
+    const gpa = grade === "A" ? 4.0 : 3.67;
+    const credit = creditHours[sub] || 0;
+
+    totalQualityPoints += gpa * credit;
+    totalCredits += credit;
+
+    rows += `<tr><td>${sub}</td><td>${marks}</td><td>${grade}</td><td>${gpa}</td><td>${credit}</td></tr>`;
+  }<tr><td>${sub}</td><td>${marks}</td><td>${grade}</td><td>${gpa}</td><td>${credit}</td></tr>`;
+  }</td><td>${s.subjects[sub]}</td></tr>`;
   }
 
   out.innerHTML = `
@@ -98,9 +123,10 @@ function checkResult(){
     <p><b>Institute:</b> ${s.institute || "Not Provided"}</p>
     <p><b>Status:</b> ${s.status || "N/A"}</p>
     <table>
-      <tr><th>Subject</th><th>Marks</th></tr>
+      <tr><th>Subject</th><th>Marks</th><th>Grade</th><th>GPA</th><th>Credit Hours</th></tr>
       ${rows}
-    </table>`;
+    </table>
+      <h3>Semester GPA: ${(totalQualityPoints / totalCredits).toFixed(2)}</h3>`;
 }
 
 function loginAdmin(){
